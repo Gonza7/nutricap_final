@@ -6,7 +6,9 @@ import FormAlimento from '../componentes/FormAlimento'
 import TablaAlimentos from '../componentes/TablaAlimentos'
 import Aviso, { conAviso, textoImportacion } from '../componentes/Aviso'
 import SeleccionExportar from '../componentes/SeleccionExportar'
-import { colores, estilos } from '../estilos'
+import { estilos } from '../estilos'
+import { Boton, Cifras } from '../componentes/PartesResultado'
+import { fuentes, tema } from '../tema'
 import { fmt, nombreAlimento, sinAcentos } from '../utiles'
 import { abrirArchivoTexto, guardarArchivo, guardarPdf, nombreConFecha } from '../respaldo/archivos'
 import { htmlAlimentos } from '../respaldo/pdf'
@@ -117,13 +119,13 @@ export default function Alimentos({
   return (
     <View>
       <Text style={styles.destino}>
-        Agregando a la ración de: <Text style={{ fontWeight: 'bold' }}>{nombreModulo}</Text>
-        {'  '}(se cambia desde la pestaña Animal, Ración o Resultados)
+        Agregando a la ración de: <Text style={{ fontFamily: fuentes.semi, color: tema.tinta }}>{nombreModulo}</Text>.
+        Se cambia en Animal, Ración o Resultados.
       </Text>
 
-      <Pressable onPress={() => setCreando(true)} style={styles.botonNuevo}>
-        <Text style={styles.botonNuevoTexto}>+ Nuevo alimento</Text>
-      </Pressable>
+      <View style={{ alignSelf: 'flex-start', marginTop: 12, marginBottom: 12 }}>
+        <Boton titulo="+ Nuevo alimento" onPress={() => setCreando(true)} />
+      </View>
 
       <View style={estilos.filaBotones}>
         <Pressable onPress={() => setExportando(true)} style={estilos.botonChico}>
@@ -151,10 +153,10 @@ export default function Alimentos({
         {filtrados.length === 0
           ? `0 de ${todos.length} alimentos`
           : `${desde + 1}–${desde + visibles.length} de ${filtrados.length} alimentos`}
-        {' · '}tocá uno para ver opciones · ✓ = en la ración
       </Text>
+      <Text style={styles.ayuda}>Tocá un alimento para ver su ficha. ✓ = está en la ración.</Text>
       {filtrados.length === 0 ? (
-        <Text>No hay alimentos que coincidan con la búsqueda.</Text>
+        <Text style={styles.ayuda}>No hay alimentos que coincidan con la búsqueda.</Text>
       ) : (
         <TablaAlimentos alimentos={visibles} enRacion={enRacion} onTocar={a => setElegidoId(a.id)} />
       )}
@@ -197,27 +199,34 @@ export default function Alimentos({
                     />
                   ) : (
                     <View>
-                      <Text style={styles.dato}>
-                        MS {(elegido.ms * 100).toFixed(1)} % · PB {(elegido.pb * 100).toFixed(1)} % · EM {elegido.em} Mcal/kg MS
-                      </Text>
-                      <Text style={styles.dato}>
-                        Ca {elegido.ca} g/kg · P {elegido.p} g/kg · FDN {elegido.fdn} %
-                      </Text>
+                      <Cifras
+                        items={[
+                          { etiqueta: 'Materia seca', valor: fmt(elegido.ms * 100, 1), unidad: '%' },
+                          { etiqueta: 'Proteína bruta', valor: fmt(elegido.pb * 100, 1), unidad: '% de la MS' },
+                          { etiqueta: 'Energía metabolizable', valor: fmt(elegido.em, 2), unidad: 'Mcal/kg MS' },
+                          { etiqueta: 'Calcio', valor: fmt(elegido.ca, 1), unidad: 'g/kg MS' },
+                          { etiqueta: 'Fósforo', valor: fmt(elegido.p, 1), unidad: 'g/kg MS' },
+                          { etiqueta: 'FDN', valor: fmt(elegido.fdn, 1), unidad: '% de la MS' },
+                        ]}
+                      />
                       {elegido.ms <= 0 ? (
                         <Text style={[estilos.alerta, { marginTop: 8 }]}>
                           Este alimento no tiene dato de materia seca: no aporta nada a la ración.
                         </Text>
                       ) : null}
 
-                      <View style={{ height: 12 }} />
+                      <View style={{ height: 16 }} />
                       {enRacion.has(elegido.id) ? (
-                        <Pressable onPress={() => sacarDeRacion(elegido.id)} style={styles.botonBorde}>
-                          <Text style={styles.botonBordeTexto}>✓ En la ración de {nombreModulo.toLowerCase()} · Sacar</Text>
-                        </Pressable>
+                        <Boton
+                          titulo={`Sacar de la ración de ${nombreModulo.toLowerCase()}`}
+                          onPress={() => sacarDeRacion(elegido.id)}
+                          secundario
+                        />
                       ) : (
-                        <Pressable onPress={() => { agregarARacion(elegido.id); cerrarFicha() }} style={styles.boton}>
-                          <Text style={styles.botonTexto}>Agregar a la ración de {nombreModulo.toLowerCase()}</Text>
-                        </Pressable>
+                        <Boton
+                          titulo={`Agregar a la ración de ${nombreModulo.toLowerCase()}`}
+                          onPress={() => { agregarARacion(elegido.id); cerrarFicha() }}
+                        />
                       )}
 
                       {elegido.predeterminado ? (
@@ -232,7 +241,7 @@ export default function Alimentos({
                       ) : (
                         <View style={[estilos.fila, { marginTop: 12 }]}>
                           <Pressable onPress={() => setEditando(true)} style={estilos.quitar}>
-                            <Text style={{ color: colores.verde, fontWeight: '600' }}>Editar</Text>
+                            <Text style={[estilos.quitarTexto, { color: tema.marca }]}>Editar</Text>
                           </Pressable>
                           <Pressable onPress={pedirBorrado} style={estilos.quitar}>
                             <Text style={estilos.quitarTexto}>{confirmar ? '¿Seguro? Tocá de nuevo' : 'Borrar'}</Text>
@@ -241,7 +250,7 @@ export default function Alimentos({
                       )}
 
                       <Pressable onPress={cerrarFicha} style={styles.cerrar}>
-                        <Text style={{ color: colores.gris, fontWeight: '600' }}>Cerrar</Text>
+                        <Text style={styles.cerrarTexto}>Cerrar</Text>
                       </Pressable>
                     </View>
                   )}
@@ -282,125 +291,105 @@ export default function Alimentos({
 
 const styles = StyleSheet.create({
   destino: {
-    marginTop: 12,
-    fontSize: 13,
-    color: colores.gris,
+    marginTop: 16,
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.suave,
+  },
+  ayuda: {
+    fontFamily: fuentes.regular,
+    fontSize: 14,
+    color: tema.tenue,
+    marginBottom: 8,
   },
   paginacion: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 12,
   },
   botonPagina: {
     borderWidth: 1,
-    borderColor: colores.verde,
-    borderRadius: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    borderColor: tema.marca,
+    borderRadius: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 14,
   },
   botonPaginaInactivo: {
-    opacity: 0.35,
+    opacity: 0.3,
   },
   botonPaginaTexto: {
-    color: colores.verde,
-    fontWeight: '600',
+    fontFamily: fuentes.semi,
+    fontSize: 15,
+    color: tema.marca,
   },
   textoPagina: {
-    color: colores.gris,
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.suave,
   },
-  botonNuevo: {
-    alignSelf: 'flex-start',
-    backgroundColor: colores.verde,
-    borderRadius: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  botonNuevoTexto: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  // Filtros por grupo
   chip: {
     borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 16,
-    paddingVertical: 5,
+    borderColor: tema.linea,
+    borderRadius: 8,
+    paddingVertical: 6,
     paddingHorizontal: 12,
   },
   chipActivo: {
-    backgroundColor: colores.verde,
-    borderColor: colores.verde,
+    backgroundColor: tema.marca,
+    borderColor: tema.marca,
   },
   chipTexto: {
-    color: colores.gris,
-    fontWeight: '600',
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.suave,
   },
   chipTextoActivo: {
     color: '#fff',
   },
   cuenta: {
-    fontSize: 12,
-    color: colores.gris,
-    marginBottom: 6,
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.tinta,
   },
+  // Ventanas que suben desde abajo (ficha y nuevo alimento)
   fondoModal: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(29,33,30,0.4)',
   },
   hoja: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-    padding: 16,
+    backgroundColor: tema.fondo,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 20,
     paddingBottom: 32,
-    maxHeight: '85%',
+    maxHeight: '88%',
     width: '100%',
     maxWidth: 720,
     alignSelf: 'center',
   },
   etiquetaTipo: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colores.verde,
-    textTransform: 'uppercase',
+    fontFamily: fuentes.regular,
+    fontSize: 14,
+    color: tema.tenue,
   },
   tituloFicha: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fuentes.semi,
+    fontSize: 24,
+    color: tema.tinta,
     marginTop: 2,
-    marginBottom: 10,
-  },
-  dato: {
-    color: '#333',
-    marginBottom: 2,
-  },
-  boton: {
-    backgroundColor: colores.verde,
-    borderRadius: 6,
-    padding: 12,
-    alignItems: 'center',
-  },
-  botonTexto: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  botonBorde: {
-    borderWidth: 1,
-    borderColor: colores.verde,
-    borderRadius: 6,
-    padding: 12,
-    alignItems: 'center',
-  },
-  botonBordeTexto: {
-    color: colores.verde,
-    fontWeight: 'bold',
+    marginBottom: 8,
   },
   cerrar: {
-    marginTop: 16,
-    padding: 10,
+    marginTop: 12,
+    padding: 12,
     alignItems: 'center',
+  },
+  cerrarTexto: {
+    fontFamily: fuentes.semi,
+    fontSize: 16,
+    color: tema.suave,
   },
 })

@@ -49,6 +49,11 @@ function crearAlimento({ id, nombre, ms, pb = 0, em = 0, ca = 0, p = 0, fdn = 0,
 // ============================================================================
 // Valores de referencia (verde oscuro fijos en el Excel)
 // ============================================================================
+// Número con coma decimal para los textos de las alertas: 0.57 → '0,57'
+function coma(x, decimales) {
+  return x.toFixed(decimales).replace('.', ',');
+}
+
 const REFERENCIAS = {
   fdnMaxPct: 40,           // [R7] FDN total máxima, % de la MS
   balanceEnergNegMaxPct: 30, // [nota H43] no superar 25–30 % de balance negativo (riesgo de cetosis)
@@ -222,10 +227,10 @@ function calcularTambo(animal, racion) {
 
   // Alertas según las notas del Excel [A90–A92]
   const alertas = [];
-  if (balances.pbG < 0)    alertas.push(`Falta proteína: ${(-balances.pbG).toFixed(0)} g PB/día.`);
-  if (balances.emMcal < 0) alertas.push(`Falta energía: ${(-balances.emMcal).toFixed(2)} Mcal EM/día.`);
-  if (balances.caG < 0)    alertas.push(`Falta calcio: ${(-balances.caG).toFixed(1)} g/día.`);
-  if (balances.pG < 0)     alertas.push(`Falta fósforo: ${(-balances.pG).toFixed(1)} g/día.`);
+  if (balances.pbG < 0)    alertas.push(`Falta proteína: ${coma(-balances.pbG, 0)} g PB/día.`);
+  if (balances.emMcal < 0) alertas.push(`Falta energía: ${coma(-balances.emMcal, 2)} Mcal EM/día.`);
+  if (balances.caG < 0)    alertas.push(`Falta calcio: ${coma(-balances.caG, 1)} g/día.`);
+  if (balances.pG < 0)     alertas.push(`Falta fósforo: ${coma(-balances.pG, 1)} g/día.`);
   if (balances.fdnPct > 0) alertas.push(`La FDN supera el ${REFERENCIAS.fdnMaxPct} % de la MS.`);
   if (indicadores.relacionCaP !== null && indicadores.relacionCaP < REFERENCIAS.relCaPMin)
     alertas.push(`Relación Ca/P por debajo de ${REFERENCIAS.relCaPMin}:1.`);
@@ -262,7 +267,7 @@ const EJEMPLO_RACION = [
 
 if (typeof module !== 'undefined') {
   module.exports = {
-    REFERENCIAS, crearAlimento,
+    REFERENCIAS, crearAlimento, coma,
     requerimientosLactancia, requerimientosUTG, prediccionesConsumo,
     aportesRacion, calcularTambo, EJEMPLO_ANIMAL, EJEMPLO_RACION,
   };

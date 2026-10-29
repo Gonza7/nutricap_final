@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { Button, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import Campo from './Campo'
+import { Boton } from './PartesResultado'
+import { fuentes, tema } from '../tema'
 import { num } from '../utiles'
 
 const VACIO = { nombre: '', grupo: '', forma: '', momento: '', ms: '', pb: '', em: '', ca: '', p: '', fdn: '', precio: '' }
@@ -61,10 +63,12 @@ export default function FormAlimento({ inicial, onGuardar, onCancelar }) {
       <Campo etiqueta="P (g/kg MS)" valor={f.p} onChange={v => cambiar('p', v)} />
       <Campo etiqueta="FDN (% de la MS)" valor={f.fdn} onChange={v => cambiar('fdn', v)} />
       <Campo etiqueta="Precio ($/kg tal cual)" ayuda="Opcional" valor={f.precio} onChange={v => cambiar('precio', v)} />
-      {error ? <Text style={{ color: '#a2461e', marginBottom: 8 }}>{error}</Text> : null}
+      {error ? (
+        <Text style={{ fontFamily: fuentes.medio, fontSize: 15, color: tema.falta, marginBottom: 10 }}>{error}</Text>
+      ) : null}
       <View style={{ gap: 8 }}>
-        <Button title={inicial ? 'Guardar cambios' : 'Agregar alimento'} onPress={guardar} color="#4a6b25" />
-        {onCancelar ? <Button title="Cancelar" onPress={onCancelar} color="#777" /> : null}
+        <Boton titulo={inicial ? 'Guardar cambios' : 'Agregar alimento'} onPress={guardar} />
+        {onCancelar ? <Boton titulo="Cancelar" onPress={onCancelar} secundario /> : null}
       </View>
     </View>
   )

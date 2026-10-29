@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import Aviso, { conAviso } from './Aviso'
-import { colores, estilos } from '../estilos'
+import { estilos } from '../estilos'
+import { fuentes, tema } from '../tema'
 import { sinAcentos } from '../utiles'
 
 // items:    [{ id, titulo, detalle }]
@@ -65,7 +66,7 @@ export default function SeleccionExportar({ visible, onCerrar, titulo, items, at
             value={busqueda}
             onChangeText={setBusqueda}
             placeholder="Buscar…"
-            placeholderTextColor={colores.gris}
+            placeholderTextColor={tema.tenue}
           />
 
           <FlatList
@@ -101,7 +102,7 @@ export default function SeleccionExportar({ visible, onCerrar, titulo, items, at
             ))}
           </View>
           <Pressable onPress={onCerrar} style={styles.cerrar}>
-            <Text style={{ color: colores.gris, fontWeight: '600' }}>Cerrar</Text>
+            <Text style={styles.cerrarTexto}>Cerrar</Text>
           </Pressable>
         </View>
       </View>
@@ -113,13 +114,13 @@ const styles = StyleSheet.create({
   fondo: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: 'rgba(29,33,30,0.4)',
   },
   hoja: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-    padding: 16,
+    backgroundColor: tema.fondo,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 20,
     paddingBottom: 28,
     height: '88%',
     width: '100%',
@@ -127,68 +128,77 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   titulo: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: fuentes.semi,
+    fontSize: 22,
+    color: tema.tinta,
   },
   cuenta: {
-    color: colores.gris,
-    marginBottom: 8,
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.suave,
+    marginBottom: 10,
   },
   atajos: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   atajo: {
     borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 16,
-    paddingVertical: 4,
+    borderColor: tema.linea,
+    borderRadius: 8,
+    paddingVertical: 6,
     paddingHorizontal: 10,
   },
   atajoTexto: {
-    color: colores.verde,
-    fontWeight: '600',
-    fontSize: 13,
+    fontFamily: fuentes.medio,
+    fontSize: 14,
+    color: tema.marca,
   },
   buscar: {
+    minHeight: 44,
     borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 6,
+    borderColor: tema.linea,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 8,
+    fontFamily: fuentes.regular,
+    fontSize: 16,
+    color: tema.tinta,
   },
   lista: {
     flex: 1,
     borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 6,
+    borderColor: tema.linea,
+    borderRadius: 8,
   },
   vacio: {
     padding: 12,
-    color: colores.gris,
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.suave,
   },
   fila: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    gap: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: tema.linea,
   },
   casilla: {
     width: 22,
     height: 22,
     borderWidth: 2,
-    borderColor: colores.verde,
+    borderColor: tema.marca,
     borderRadius: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
   casillaMarcada: {
-    backgroundColor: colores.verde,
+    backgroundColor: tema.marca,
   },
   tilde: {
     color: '#fff',
@@ -197,11 +207,14 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   itemTitulo: {
-    fontWeight: '600',
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.tinta,
   },
   itemDetalle: {
-    fontSize: 12,
-    color: colores.gris,
+    fontFamily: fuentes.regular,
+    fontSize: 13,
+    color: tema.tenue,
   },
   acciones: {
     flexDirection: 'row',
@@ -209,18 +222,24 @@ const styles = StyleSheet.create({
   },
   accion: {
     flex: 1,
-    backgroundColor: colores.verde,
-    borderRadius: 6,
-    padding: 12,
+    backgroundColor: tema.marca,
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   accionTexto: {
+    fontFamily: fuentes.semi,
+    fontSize: 16,
     color: '#fff',
-    fontWeight: 'bold',
   },
   cerrar: {
     marginTop: 6,
-    padding: 8,
+    padding: 10,
     alignItems: 'center',
+  },
+  cerrarTexto: {
+    fontFamily: fuentes.semi,
+    fontSize: 16,
+    color: tema.suave,
   },
 })

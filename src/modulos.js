@@ -3,8 +3,8 @@
 import { fmt } from './utiles'
 
 export const MODULOS = {
-  tambo: { titulo: 'Tambo', subtitulo: 'Tambo · cabras lecheras', tituloPdf: 'Ración para cabra lechera' },
-  carne: { titulo: 'Carne', subtitulo: 'Carne · cabritos y recría', tituloPdf: 'Ración para producción de carne' },
+  tambo: { titulo: 'Tambo', subtitulo: 'Cabras lecheras', tituloPdf: 'Ración para cabra lechera' },
+  carne: { titulo: 'Carne', subtitulo: 'Cabritos y recría', tituloPdf: 'Ración para producción de carne' },
 }
 
 export const ETAPAS = { lactante: 'Nacimiento a 90 días', recria: '90 días a 18 meses' }
@@ -24,19 +24,19 @@ export function resumenAnimal(h) {
   return `PV ${fmt(n(d.pv), 1)} kg · ${fmt(n(d.litros), 1)} L/día · GB ${fmt(n(d.gb), 1)} %`
 }
 
-// Las filas de la tabla de balance de un cálculo guardado (props para FilaBalance)
+// Las filas del balance de un cálculo guardado (props para BarraBalance, más el título)
 export function filasBalance(h) {
   const b = h.balance
   const filas = [
-    { clave: 'pb', nombre: 'PB', nombreLargo: 'Proteína bruta (g)', unidad: 'g', decimales: 0, ...b.pb },
-    { clave: 'em', nombre: 'EM', nombreLargo: 'Energía metabolizable (Mcal)', unidad: 'Mcal', decimales: 2, ...b.em },
-    { clave: 'ca', nombre: 'Calcio', nombreLargo: 'Calcio (g)', unidad: 'g', decimales: 1, ...b.ca },
-    { clave: 'p', nombre: 'Fósforo', nombreLargo: 'Fósforo (g)', unidad: 'g', decimales: 1, ...b.p },
+    { clave: 'pb', titulo: 'Proteína bruta', nombre: 'PB', nombreLargo: 'Proteína bruta (g)', unidad: 'g', decimales: 0, ...b.pb },
+    { clave: 'em', titulo: 'Energía metabolizable', nombre: 'EM', nombreLargo: 'Energía metabolizable (Mcal)', unidad: 'Mcal', decimales: 2, ...b.em },
+    { clave: 'ca', titulo: 'Calcio', nombre: 'Calcio', nombreLargo: 'Calcio (g)', unidad: 'g', decimales: 1, ...b.ca },
+    { clave: 'p', titulo: 'Fósforo', nombre: 'Fósforo', nombreLargo: 'Fósforo (g)', unidad: 'g', decimales: 1, ...b.p },
   ]
   if (moduloDe(h) === 'tambo') {
-    filas.push({ clave: 'fdn', nombre: 'FDN máx.', nombreLargo: 'FDN (% de la MS, máximo)', unidad: '% MS', decimales: 1, alReves: true, ...b.fdn })
+    filas.push({ clave: 'fdn', titulo: 'FDN', nombre: 'FDN máx.', nombreLargo: 'FDN (% de la MS, máximo)', unidad: '% MS', decimales: 1, alReves: true, ...b.fdn })
   } else if (b.fdn) {
-    filas.push({ clave: 'fdn', nombre: 'FDN mín.', nombreLargo: 'FDN (kg, mínimo 35 % de la MS)', unidad: 'kg', decimales: 3, ...b.fdn })
+    filas.push({ clave: 'fdn', titulo: 'FDN mínima', nombre: 'FDN mín.', nombreLargo: 'FDN (kg, mínimo 35 % de la MS)', unidad: 'kg', decimales: 3, ...b.fdn })
   }
   return filas
 }

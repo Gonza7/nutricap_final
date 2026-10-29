@@ -1,20 +1,23 @@
-// Botones para elegir una opción entre pocas (por ejemplo Hembra / Macho)
+// Para elegir una opción entre pocas (Tambo / Carne, Hembra / Macho).
+// Se dibuja como una sola barra dividida: la opción elegida queda rellena.
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { colores } from '../estilos'
+import { fuentes, tema } from '../tema'
 
 // opciones: { valor: 'texto a mostrar', ... }
 export default function Opciones({ etiqueta, opciones, valor, onChange }) {
+  const lista = Object.entries(opciones)
+
   return (
-    <View style={{ marginBottom: 14 }}>
+    <View style={{ marginBottom: etiqueta ? 16 : 0 }}>
       {etiqueta ? <Text style={styles.etiqueta}>{etiqueta}</Text> : null}
-      <View style={styles.fila}>
-        {Object.entries(opciones).map(([v, texto]) => {
+      <View style={styles.barra} accessibilityRole="radiogroup">
+        {lista.map(([v, texto], i) => {
           const activa = v === valor
           return (
             <Pressable
               key={v}
               onPress={() => onChange(v)}
-              style={[styles.opcion, activa && styles.opcionActiva]}
+              style={[styles.opcion, i > 0 && styles.separador, activa && styles.opcionActiva]}
               accessibilityRole="radio"
               accessibilityState={{ checked: activa }}
             >
@@ -28,16 +31,38 @@ export default function Opciones({ etiqueta, opciones, valor, onChange }) {
 }
 
 const styles = StyleSheet.create({
-  etiqueta: { fontWeight: '600', marginBottom: 6 },
-  fila: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  opcion: {
-    borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+  etiqueta: {
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.tinta,
+    marginBottom: 6,
   },
-  opcionActiva: { backgroundColor: colores.verde, borderColor: colores.verde },
-  texto: { fontWeight: '600', color: colores.gris },
-  textoActivo: { color: '#fff' },
+  barra: {
+    flexDirection: 'row',
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: tema.marca,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  opcion: {
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+  },
+  separador: {
+    borderLeftWidth: 1,
+    borderLeftColor: tema.marca,
+  },
+  opcionActiva: {
+    backgroundColor: tema.marca,
+  },
+  texto: {
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.marca,
+  },
+  textoActivo: {
+    color: '#fff',
+  },
 })

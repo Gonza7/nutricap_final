@@ -11,7 +11,7 @@
  *
  * Los aportes de la ración se calculan igual que en tambo (misma función).
  */
-const { aportesRacion } = require('./tambo');
+const { aportesRacion, coma } = require('./tambo');
 
 // ============================================================================
 // Coeficientes de cada hoja
@@ -93,12 +93,12 @@ function calcularCarne(animal, racion) {
 
   const alertas = [];
   if (ap.msKg > 0) {
-    if (balances.pbG < 0) alertas.push(`Falta proteína: ${(-balances.pbG).toFixed(0)} g PB/día.`);
-    if (balances.emMcal < 0) alertas.push(`Falta energía: ${(-balances.emMcal).toFixed(2)} Mcal EM/día.`);
-    if (balances.caG < 0) alertas.push(`Falta calcio: ${(-balances.caG).toFixed(1)} g/día.`);
-    if (balances.pG < 0) alertas.push(`Falta fósforo: ${(-balances.pG).toFixed(1)} g/día.`);
+    if (balances.pbG < 0) alertas.push(`Falta proteína: ${coma(-balances.pbG, 0)} g PB/día.`);
+    if (balances.emMcal < 0) alertas.push(`Falta energía: ${coma(-balances.emMcal, 2)} Mcal EM/día.`);
+    if (balances.caG < 0) alertas.push(`Falta calcio: ${coma(-balances.caG, 1)} g/día.`);
+    if (balances.pG < 0) alertas.push(`Falta fósforo: ${coma(-balances.pG, 1)} g/día.`);
     if (balances.fdnKg !== null && balances.fdnKg < 0) {
-      alertas.push(`La FDN no llega al ${REFERENCIAS_CARNE.fdnFraccionMS * 100} % de la MS: faltan ${(-balances.fdnKg * 1000).toFixed(0)} g/día.`);
+      alertas.push(`La FDN no llega al ${REFERENCIAS_CARNE.fdnFraccionMS * 100} % de la MS: faltan ${coma(-balances.fdnKg * 1000, 0)} g/día.`);
     }
     if (indicadores.relacionCaP !== null && indicadores.relacionCaP < REFERENCIAS_CARNE.relCaPMin) {
       alertas.push(`Relación Ca/P por debajo de ${REFERENCIAS_CARNE.relCaPMin}:1.`);

@@ -1,9 +1,10 @@
 // Guardar el cálculo actual en el historial o descargarlo en PDF. Lo usan los dos módulos.
 import { useState } from 'react'
-import { Button, Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import Campo from './Campo'
 import Aviso, { conAviso } from './Aviso'
-import { estilos } from '../estilos'
+import { Boton, Titulo } from './PartesResultado'
+import { fuentes, tema } from '../tema'
 import { guardarPdf, nombreConFecha } from '../respaldo/archivos'
 import { htmlCalculo } from '../respaldo/pdf'
 
@@ -27,7 +28,7 @@ export default function GuardarCalculo({ guardarEnHistorial, armarEntrada, ejemp
 
   return (
     <View>
-      <Text style={estilos.seccion}>Guardar este cálculo</Text>
+      <Titulo>Guardar este cálculo</Titulo>
       <Campo
         etiqueta="Nombre (opcional)"
         ayuda={`Por ejemplo: ${ejemploNombre}`}
@@ -35,11 +36,15 @@ export default function GuardarCalculo({ guardarEnHistorial, armarEntrada, ejemp
         valor={nombre}
         onChange={setNombre}
       />
-      <View style={{ gap: 8 }}>
-        <Button title="Guardar en el historial" onPress={guardar} color="#4a6b25" />
-        <Button title="Descargar PDF" onPress={pdf} color="#2d6585" />
+      <View style={{ gap: 8, marginTop: 4 }}>
+        <Boton titulo="Guardar en el historial" onPress={guardar} />
+        <Boton titulo="Descargar PDF" onPress={pdf} secundario />
       </View>
-      {guardado ? <Text style={[estilos.ok, { marginTop: 8 }]}>Guardado. Lo ves en la pestaña Historial.</Text> : null}
+      {guardado ? (
+        <Text style={{ fontFamily: fuentes.medio, fontSize: 15, color: tema.sobra, marginTop: 8 }}>
+          Guardado. Lo ves en la pestaña Historial.
+        </Text>
+      ) : null}
       <View style={{ marginTop: 8 }}>
         <Aviso aviso={aviso} onCerrar={() => setAviso(null)} />
       </View>

@@ -1,19 +1,23 @@
 // Estilos que usan varias pantallas. Así se definen una sola vez.
+// Los colores y las letras salen de tema.js.
 import { StyleSheet } from 'react-native'
+import { fuentes, tema } from './tema'
 
+// Nombres viejos, para que las pantallas que todavía los usan sigan andando
 export const colores = {
-  verde: '#4a6b25',
-  rojo: '#a2461e',
-  gris: '#777',
-  linea: '#ccc',
+  verde: tema.marca,
+  rojo: tema.falta,
+  gris: tema.suave,
+  linea: tema.linea,
 }
 
 export const estilos = StyleSheet.create({
   seccion: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
+    fontFamily: fuentes.semi,
+    fontSize: 20,
+    color: tema.tinta,
+    marginTop: 28,
+    marginBottom: 12,
   },
   fila: {
     flexDirection: 'row',
@@ -25,46 +29,61 @@ export const estilos = StyleSheet.create({
     paddingHorizontal: 10,
   },
   quitarTexto: {
-    color: colores.rojo,
-    fontWeight: '600',
+    fontFamily: fuentes.semi,
+    fontSize: 15,
+    color: tema.falta,
   },
   cabecera: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: colores.linea,
+    borderBottomColor: tema.linea,
     paddingBottom: 4,
   },
   cabeceraTexto: {
     flex: 1,
     textAlign: 'right',
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colores.gris,
+    fontFamily: fuentes.medio,
+    fontSize: 13,
+    color: tema.suave,
   },
+  // Avisos: una rayita de color a la izquierda, sin fondo
   alerta: {
-    color: colores.rojo,
-    backgroundColor: '#f6e1d6',
-    padding: 8,
-    borderRadius: 6,
-    marginBottom: 6,
+    fontFamily: fuentes.regular,
+    fontSize: 16,
+    color: tema.tinta,
+    borderLeftWidth: 3,
+    borderLeftColor: tema.falta,
+    paddingLeft: 10,
+    paddingVertical: 2,
+    marginBottom: 8,
   },
   ok: {
-    color: '#2f7a3a',
-    backgroundColor: '#dcefdc',
-    padding: 8,
-    borderRadius: 6,
+    fontFamily: fuentes.medio,
+    fontSize: 16,
+    color: tema.sobra,
   },
+  // Botón de "Empezar de cero": con borde rojo, porque borra
   borrar: {
     marginTop: 32,
-    padding: 12,
+    alignSelf: 'flex-start',   // tan ancho como su texto
+    paddingHorizontal: 24,
+    minHeight: 48,
+    justifyContent: 'center',
     borderWidth: 1,
-    borderColor: colores.rojo,
-    borderRadius: 6,
+    borderColor: tema.falta,
+    borderRadius: 8,
     alignItems: 'center',
   },
   borrarTexto: {
-    color: colores.rojo,
-    fontWeight: '600',
+    fontFamily: fuentes.semi,
+    fontSize: 16,
+    color: tema.falta,
+  },
+  nota: {
+    fontFamily: fuentes.regular,
+    fontSize: 14,
+    color: tema.tenue,
+    marginTop: 6,
   },
   // Botones chicos de PDF, exportar e importar
   filaBotones: {
@@ -75,25 +94,28 @@ export const estilos = StyleSheet.create({
   },
   botonChico: {
     borderWidth: 1,
-    borderColor: colores.verde,
-    borderRadius: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+    borderColor: tema.marca,
+    borderRadius: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 12,
   },
   botonChicoTexto: {
-    color: colores.verde,
-    fontWeight: '600',
-    fontSize: 13,
+    fontFamily: fuentes.semi,
+    fontSize: 15,
+    color: tema.marca,
   },
   aviso: {
-    color: '#2f7a3a',
-    backgroundColor: '#dcefdc',
-    padding: 8,
-    borderRadius: 6,
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.sobra,
+    borderLeftWidth: 3,
+    borderLeftColor: tema.sobra,
+    paddingLeft: 10,
+    paddingVertical: 2,
     marginBottom: 10,
   },
   avisoError: {
-    color: colores.rojo,
-    backgroundColor: '#f6e1d6',
+    color: tema.falta,
+    borderLeftColor: tema.falta,
   },
 })

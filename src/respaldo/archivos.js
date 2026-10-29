@@ -61,6 +61,21 @@ export async function abrirArchivoTexto() {
 }
 
 // Convierte un HTML en PDF. opciones: { width, height } en puntos (A4 vertical = 595 x 842)
+// Espera a que cargue la hoja de estilos de Google Fonts y después la letra del PDF
+async function esperarLetra(doc) {
+  try {
+    const link = doc.querySelector('link[rel="stylesheet"]')
+    if (link && !link.sheet) {
+      await new Promise(r => { link.onload = r; link.onerror = r })
+    }
+    await doc.fonts.load('16px "Barlow Semi Condensed"')
+    await doc.fonts.load('600 16px "Barlow Semi Condensed"')
+    await doc.fonts.ready
+  } catch {
+    // sin internet: se imprime con la letra de la computadora
+  }
+}
+
 export async function guardarPdf(nombre, html, opciones = {}) {
   if (esWeb) {
     // Se arma un marco invisible con el documento y se abre la ventana de impresión,
@@ -75,11 +90,13 @@ export async function guardarPdf(nombre, html, opciones = {}) {
     marco.contentDocument.write(html)
     marco.contentDocument.close()
     marco.contentDocument.title = nombre.replace('.pdf', '')   // nombre sugerido del PDF
+    // Antes de imprimir se espera a que baje la letra (como mucho 3 segundos; si no llega, imprime igual)
+    await Promise.race([esperarLetra(marco.contentDocument), new Promise(r => setTimeout(r, 3000))])
     setTimeout(() => {
       marco.contentWindow.focus()
       marco.contentWindow.print()
       setTimeout(() => marco.remove(), 1000)
-    }, 300)
+    }, 100)
     return
   }
   // El PDF se pide en base64 (como texto) y se escribe en la carpeta propia de la app.

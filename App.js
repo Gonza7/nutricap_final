@@ -1,4 +1,12 @@
 import { StatusBar } from 'expo-status-bar'
+import Ionicons from '@expo/vector-icons/Ionicons'
+import {
+  useFonts,
+  BarlowSemiCondensed_400Regular,
+  BarlowSemiCondensed_500Medium,
+  BarlowSemiCondensed_600SemiBold,
+  BarlowSemiCondensed_700Bold,
+} from '@expo-google-fonts/barlow-semi-condensed'
 import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -7,7 +15,7 @@ import { calcularCarne } from './src/calculos/carne'
 import { fmt, num } from './src/utiles'
 import { ALIMENTOS_BASE } from './src/datos/alimentosBase'
 import { csvAAlimentos, csvAHistorial } from './src/respaldo/respaldo'
-import { colores } from './src/estilos'
+import { fuentes, tema } from './src/tema'
 import Cabra from './src/pantallas/Cabra'
 import Racion from './src/pantallas/Racion'
 import Alimentos from './src/pantallas/Alimentos'
@@ -16,7 +24,6 @@ import Resultados from './src/pantallas/Resultados'
 import AnimalCarne from './src/pantallas/AnimalCarne'
 import ResultadosCarne from './src/pantallas/ResultadosCarne'
 import Opciones from './src/componentes/Opciones'
-import Tarjetas from './src/componentes/Tarjetas'
 import { MODULOS, moduloDe } from './src/modulos'
 
 // Nombres con los que se guardan los datos en el dispositivo
@@ -49,12 +56,13 @@ const DATOS_CARNE_INICIALES = {
 }
 
 // Las pestañas de abajo
+// icono: nombre del ícono de Ionicons (https://icons.expo.fyi). La pestaña activa usa el relleno.
 const PESTANAS = [
-  { id: 'cabra', texto: 'Animal' },
-  { id: 'racion', texto: 'Ración' },
-  { id: 'alimentos', texto: 'Alimentos' },
-  { id: 'resultados', texto: 'Resultados' },
-  { id: 'historial', texto: 'Historial' },
+  { id: 'cabra', texto: 'Animal', icono: 'paw' },
+  { id: 'racion', texto: 'Ración', icono: 'nutrition' },
+  { id: 'alimentos', texto: 'Alimentos', icono: 'leaf' },
+  { id: 'resultados', texto: 'Resultados', icono: 'bar-chart' },
+  { id: 'historial', texto: 'Historial', icono: 'time' },
 ]
 
 export default function App () {
@@ -69,6 +77,13 @@ export default function App () {
   const [cargado, setCargado] = useState(false)    // ¿ya se leyó lo guardado?
   const [confirmarBorrado, setConfirmarBorrado] = useState(false)
   const [pestana, setPestana] = useState('cabra')  // qué pestaña se está viendo
+  // Letras del diseño nuevo. fuentesListas pasa a true cuando terminan de cargar.
+  const [fuentesListas] = useFonts({
+    BarlowSemiCondensed_400Regular,
+    BarlowSemiCondensed_500Medium,
+    BarlowSemiCondensed_600SemiBold,
+    BarlowSemiCondensed_700Bold,
+  })
 
   // Al abrir la app: leer lo guardado (una sola vez). Promise.all lee las dos claves a la vez.
   useEffect(() => {
@@ -299,7 +314,7 @@ export default function App () {
   }
 
   // 5. Pantalla
-  if (!cargado) {
+  if (!cargado || !fuentesListas) {
     return (
       <View style={styles.container}>
         <Text style={{ padding: 48 }}>Cargando…</Text>
@@ -311,37 +326,36 @@ export default function App () {
     <View style={styles.container}>
       {/* Encabezado y resumen, con el mismo ancho máximo que el contenido */}
       <View style={styles.columna}>
-        {/* Encabezado fijo */}
+        {/* Encabezado fijo: nombre a la izquierda, Tambo / Carne a la derecha */}
         <View style={styles.encabezado}>
-          <Text style={styles.titulo}>NutriCap</Text>
-          <Text style={styles.subtitulo}>{MODULOS[modulo].subtitulo}</Text>
+          <View style={{ flexShrink: 1 }}>
+            <Text style={styles.titulo}>NutriCap</Text>
+            <Text style={styles.subtitulo}>{MODULOS[modulo].subtitulo}</Text>
+          </View>
           {/* El selector de módulo solo aparece donde cambia algo: Animal, Ración y Resultados */}
           {['cabra', 'racion', 'resultados'].includes(pestana) ? (
-            <View style={{ marginTop: 8, marginBottom: -6 }}>
-              <Opciones
-                opciones={{ tambo: 'Tambo (leche)', carne: 'Carne' }}
-                valor={modulo}
-                onChange={setModulo}
-              />
-            </View>
+            <Opciones
+              opciones={{ tambo: 'Tambo', carne: 'Carne' }}
+              valor={modulo}
+              onChange={setModulo}
+            />
           ) : null}
         </View>
 
-        {/* Resumen del balance, visible desde cualquier pestaña */}
-        {hayRacion && pesoCargado ? (
-          <View style={styles.resumen}>
-            <Tarjetas
-              titulo="Balance de la ración"
-              tono="balance"
-              compacta
-              items={[
-                itemBalance('PB', r.balances.pbG, 0, 'g'),
-                itemBalance('EM', r.balances.emMcal, 2, 'Mcal'),
-                itemBalance('Ca', r.balances.caG, 1, 'g'),
-                itemBalance('P', r.balances.pG, 1, 'g'),
-              ]}
-            />
-          </View>
+        {/* Resumen del balance, en todas las pestañas menos Resultados (ahí ya está completo).
+            Al tocarlo se va a Resultados. */}
+        {hayRacion && pesoCargado && pestana !== 'resultados' ? (
+          <Pressable
+            onPress={() => setPestana('resultados')}
+            style={styles.resumen}
+            accessibilityRole="button"
+            accessibilityLabel="Balance de la ración. Tocá para ver los resultados."
+          >
+            <ItemResumen etiqueta="PB" valor={r.balances.pbG} decimales={0} unidad="g" />
+            <ItemResumen etiqueta="EM" valor={r.balances.emMcal} decimales={2} unidad="Mcal" />
+            <ItemResumen etiqueta="Ca" valor={r.balances.caG} decimales={1} unidad="g" />
+            <ItemResumen etiqueta="P" valor={r.balances.pG} decimales={1} unidad="g" />
+          </Pressable>
         ) : null}
       </View>
 
@@ -410,8 +424,18 @@ export default function App () {
           {PESTANAS.map(p => {
             const activa = p.id === pestana
             return (
-              <Pressable key={p.id} onPress={() => setPestana(p.id)} style={styles.pestana}>
-                <View style={[styles.marca, activa && styles.marcaActiva]} />
+              <Pressable
+                key={p.id}
+                onPress={() => setPestana(p.id)}
+                style={styles.pestana}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: activa }}
+              >
+                <Ionicons
+                  name={activa ? p.icono : `${p.icono}-outline`}
+                  size={22}
+                  color={activa ? tema.marca : tema.tenue}
+                />
                 <Text style={[styles.pestanaTexto, activa && styles.pestanaTextoActiva]}>{p.texto}</Text>
               </Pressable>
             )
@@ -423,22 +447,24 @@ export default function App () {
   )
 }
 
-// Una cajita del balance de arriba: roja si falta, verde si alcanza
-function itemBalance(etiqueta, valor, decimales, unidad) {
+// Un número del resumen de arriba: rojo si falta, verde si alcanza
+function ItemResumen({ etiqueta, valor, decimales, unidad }) {
   const signo = valor > 0 ? '+' : ''
-  return {
-    etiqueta,
-    valor: signo + fmt(valor, decimales),
-    unidad,
-    alerta: valor < 0,
-    ok: valor >= 0,
-  }
+  return (
+    <View style={styles.resumenItem}>
+      <Text style={styles.resumenEtiqueta}>{etiqueta}</Text>
+      <Text style={[styles.resumenValor, { color: valor < 0 ? tema.falta : tema.sobra }]}>
+        {signo}{fmt(valor, decimales)}
+        <Text style={styles.resumenUnidad}> {unidad}</Text>
+      </Text>
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: tema.fondo,
   },
   columna: {
     width: '100%',
@@ -446,47 +472,72 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   encabezado: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
     paddingHorizontal: 16,
     paddingTop: 48,
-    paddingBottom: 8,
+    paddingBottom: 12,
   },
   titulo: {
+    fontFamily: fuentes.negrita,
     fontSize: 28,
-    fontWeight: 'bold',
+    color: tema.tinta,
+    lineHeight: 32,
   },
   subtitulo: {
-    color: '#555',
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.suave,
   },
+  // Resumen: cuatro números en fila, entre dos líneas finas
   resumen: {
+    flexDirection: 'row',
     marginHorizontal: 16,
-    marginTop: -12,      // Tarjetas ya trae margen arriba; así queda pegado al encabezado
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: tema.linea,
+    paddingVertical: 8,
+  },
+  resumenItem: {
+    flex: 1,
+  },
+  resumenEtiqueta: {
+    fontFamily: fuentes.medio,
+    fontSize: 13,
+    color: tema.suave,
+  },
+  resumenValor: {
+    fontFamily: fuentes.semi,
+    fontSize: 19,
+    fontVariant: ['tabular-nums'],
+  },
+  resumenUnidad: {
+    fontFamily: fuentes.regular,
+    fontSize: 13,
+    color: tema.tenue,
   },
   barra: {
     borderTopWidth: 1,
-    borderTopColor: colores.linea,
+    borderTopColor: tema.linea,
+    paddingTop: 8,
     paddingBottom: 24,   // espacio para la barra de gestos del celular
-    backgroundColor: '#fff',
+    backgroundColor: tema.fondo,
   },
   pestana: {
     flex: 1,
     alignItems: 'center',
-    paddingBottom: 6,
-  },
-  marca: {
-    height: 3,
-    width: 40,
-    marginBottom: 8,
-    backgroundColor: 'transparent',
-  },
-  marcaActiva: {
-    backgroundColor: colores.verde,
+    gap: 2,
+    paddingVertical: 2,
   },
   pestanaTexto: {
-    fontWeight: '600',
-    fontSize: 13,   // más chico para que entren las 5 pestañas
-    color: colores.gris,
+    fontFamily: fuentes.medio,
+    fontSize: 13,   // chico para que entren las 5 pestañas
+    color: tema.tenue,
   },
   pestanaTextoActiva: {
-    color: colores.verde,
+    color: tema.marca,
   },
 })

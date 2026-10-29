@@ -3,14 +3,15 @@
 // - Angosta (celular): la columna del nombre queda fija y el resto se desliza de costado.
 import { useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { colores } from '../estilos'
-import { detalleAlimento, mayuscula } from '../utiles'
+import { fuentes, tema } from '../tema'
+import { detalleAlimento, fmt, mayuscula } from '../utiles'
 
 const ANCHO_MINIMO_COMPLETA = 760   // desde este ancho (en píxeles) se muestra la tabla completa
 const ALTO = 50                     // alto de fila en la vista angosta (igual en las dos partes)
 const ANCHO_NOMBRE = 150
 
-const corto = x => String(+Number(x).toFixed(2))   // 3.00 → '3', 0.25 → '0.25'
+// Hasta 2 decimales y sin ceros de más, con coma: 3 → '3', 0.25 → '0,25'
+const corto = x => Number(x).toLocaleString('es-AR', { maximumFractionDigits: 2 })
 
 // Columnas de texto: solo en la vista ancha
 const COLUMNAS_TEXTO = [
@@ -21,22 +22,22 @@ const COLUMNAS_TEXTO = [
 
 // Columnas numéricas: en las dos vistas
 const COLUMNAS = [
-  { titulo: 'MS %', ancho: 54, valor: a => (a.ms * 100).toFixed(1) },
-  { titulo: 'PB %', ancho: 54, valor: a => (a.pb * 100).toFixed(1) },
-  { titulo: 'EM', ancho: 48, valor: a => a.em.toFixed(2) },
+  { titulo: 'MS %', ancho: 54, valor: a => fmt(a.ms * 100, 1) },
+  { titulo: 'PB %', ancho: 54, valor: a => fmt(a.pb * 100, 1) },
+  { titulo: 'EM', ancho: 48, valor: a => fmt(a.em, 2) },
   { titulo: 'Ca', ancho: 48, valor: a => corto(a.ca) },
   { titulo: 'P', ancho: 48, valor: a => corto(a.p) },
   { titulo: 'FDN %', ancho: 54, valor: a => corto(a.fdn) },
   { titulo: '$/kg', ancho: 58, valor: a => (a.precio ? corto(a.precio) : '–') },
 ]
 
-const fondo = i => (i % 2 === 0 ? '#fff' : '#f6f7f3')   // filas alternadas para leer mejor
+const fondo = i => (i % 2 === 0 ? tema.fondo : '#f8f9f7')   // filas alternadas para leer mejor
 
 // Nombre con el ✓ si está en la ración y la marca "propio"
 function Nombre({ a, enRacion }) {
   return (
     <Text style={styles.nombre} numberOfLines={1}>
-      {enRacion.has(a.id) ? <Text style={{ color: colores.verde }}>✓ </Text> : null}
+      {enRacion.has(a.id) ? <Text style={{ color: tema.marca }}>✓ </Text> : null}
       {mayuscula(a.nombre)}
       {a.predeterminado ? null : <Text style={styles.propio}>  propio</Text>}
     </Text>
@@ -132,8 +133,8 @@ function TablaAngosta({ alimentos, enRacion, onTocar }) {
 const styles = StyleSheet.create({
   tabla: {
     borderWidth: 1,
-    borderColor: colores.linea,
-    borderRadius: 6,
+    borderColor: tema.linea,
+    borderRadius: 8,
     overflow: 'hidden',
   },
   fila: {
@@ -141,67 +142,75 @@ const styles = StyleSheet.create({
   },
   // Vista ancha
   filaCabecera: {
-    backgroundColor: '#eef1e8',
+    backgroundColor: tema.superficie,
     borderBottomWidth: 1,
-    borderBottomColor: colores.linea,
+    borderBottomColor: tema.linea,
     paddingVertical: 8,
   },
   filaAncha: {
     alignItems: 'center',
-    paddingVertical: 9,
+    paddingVertical: 10,
   },
   celdaTexto: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
   },
   celdaNumero: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     textAlign: 'right',
   },
   texto: {
-    color: '#444',
+    fontFamily: fuentes.regular,
+    fontSize: 14,
+    color: tema.suave,
   },
   // Vista angosta
   celdaCabecera: {
-    height: 32,
+    height: 34,
     justifyContent: 'center',
     alignItems: 'flex-end',
-    paddingHorizontal: 6,
-    backgroundColor: '#eef1e8',
+    paddingHorizontal: 8,
+    backgroundColor: tema.superficie,
     borderBottomWidth: 1,
-    borderBottomColor: colores.linea,
+    borderBottomColor: tema.linea,
   },
   celdaNombre: {
     height: ALTO,
     justifyContent: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     borderRightWidth: 1,
-    borderRightColor: colores.linea,
+    borderRightColor: tema.linea,
   },
   celda: {
     height: ALTO,
     justifyContent: 'center',
     alignItems: 'flex-end',
-    paddingHorizontal: 6,
+    paddingHorizontal: 8,
   },
   detalle: {
-    fontSize: 11,
-    color: colores.gris,
+    fontFamily: fuentes.regular,
+    fontSize: 13,
+    color: tema.tenue,
   },
   // Comunes
   cabecera: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: colores.gris,
+    fontFamily: fuentes.medio,
+    fontSize: 13,
+    color: tema.suave,
   },
   nombre: {
-    fontWeight: '600',
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.tinta,
   },
   propio: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#2d6585',
+    fontFamily: fuentes.regular,
+    fontSize: 13,
+    color: tema.tenue,
   },
   numero: {
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.tinta,
     fontVariant: ['tabular-nums'],
   },
 })

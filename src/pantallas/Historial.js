@@ -1,10 +1,11 @@
 // Pestaña "Historial": cálculos guardados. Cada uno es una "foto" del momento en que se guardó.
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import FilaBalance from '../componentes/FilaBalance'
+import BarraBalance from '../componentes/BarraBalance'
 import Aviso, { conAviso, textoImportacion } from '../componentes/Aviso'
 import SeleccionExportar from '../componentes/SeleccionExportar'
-import { colores, estilos } from '../estilos'
+import { estilos } from '../estilos'
+import { fuentes, tema } from '../tema'
 import { fmt, nombreAlimento } from '../utiles'
 import { MODULOS, filasBalance, moduloDe, resumenAnimal } from '../modulos'
 import { abrirArchivoTexto, guardarArchivo, guardarPdf, nombreConFecha } from '../respaldo/archivos'
@@ -106,7 +107,9 @@ export default function Historial({ historial, cargarDelHistorial, borrarDelHist
       <View>
         <Text style={estilos.seccion}>Historial</Text>
         {botones}
-        <Text>Todavía no guardaste cálculos. Armá una ración y tocá "Guardar en el historial" en la pestaña Resultados.</Text>
+        <Text style={styles.vacio}>
+          Todavía no guardaste cálculos. Armá una ración y tocá "Guardar en el historial" en la pestaña Resultados.
+        </Text>
       </View>
     )
   }
@@ -120,31 +123,48 @@ export default function Historial({ historial, cargarDelHistorial, borrarDelHist
         const signo = x => (x > 0 ? '+' : '')
         return (
           <View key={h.id} style={styles.tarjeta}>
-            <Text style={styles.modulo}>{MODULOS[moduloDe(h)].titulo}</Text>
-            <Text style={styles.nombre}>{h.nombre || 'Sin nombre'}</Text>
+            <View style={styles.cabeza}>
+              <Text style={styles.nombre}>{h.nombre || 'Sin nombre'}</Text>
+              <Text style={styles.modulo}>{MODULOS[moduloDe(h)].titulo}</Text>
+            </View>
             <Text style={styles.detalle}>{formatoFecha(h.fecha)}</Text>
             <Text style={styles.detalle}>{resumenAnimal(h)}</Text>
-            <Text style={styles.resumen}>
-              <Text style={{ color: b.pb.balance < 0 ? colores.rojo : '#2f7a3a' }}>
-                PB {signo(b.pb.balance)}{b.pb.balance.toFixed(0)} g
-              </Text>
-              {'  ·  '}
-              <Text style={{ color: b.em.balance < 0 ? colores.rojo : '#2f7a3a' }}>
-                EM {signo(b.em.balance)}{b.em.balance.toFixed(2)} Mcal
-              </Text>
-              {'  ·  '}${h.costo.toFixed(0)}/día
-            </Text>
+
+            {/* Resumen: tres números en fila */}
+            <View style={styles.resumen}>
+              <View style={styles.dato}>
+                <Text style={styles.datoEtiqueta}>PB</Text>
+                <Text style={[styles.datoValor, { color: b.pb.balance < 0 ? tema.falta : tema.sobra }]}>
+                  {signo(b.pb.balance)}{fmt(b.pb.balance, 0)} <Text style={styles.datoUnidad}>g</Text>
+                </Text>
+              </View>
+              <View style={styles.dato}>
+                <Text style={styles.datoEtiqueta}>EM</Text>
+                <Text style={[styles.datoValor, { color: b.em.balance < 0 ? tema.falta : tema.sobra }]}>
+                  {signo(b.em.balance)}{fmt(b.em.balance, 2)} <Text style={styles.datoUnidad}>Mcal</Text>
+                </Text>
+              </View>
+              <View style={styles.dato}>
+                <Text style={styles.datoEtiqueta}>Costo</Text>
+                <Text style={styles.datoValor}>
+                  $ {fmt(h.costo, 0)} <Text style={styles.datoUnidad}>por día</Text>
+                </Text>
+              </View>
+            </View>
 
             {abierto === h.id ? (
               <View style={{ marginTop: 8 }}>
                 <Text style={styles.subtitulo}>Ración</Text>
                 {h.racion.map(x => (
-                  <Text key={x.alimento.id} style={styles.detalle}>• {nombreAlimento(x.alimento)}: {x.kg} kg</Text>
+                  <View key={x.alimento.id} style={styles.renglon}>
+                    <Text style={styles.renglonNombre}>{nombreAlimento(x.alimento)}</Text>
+                    <Text style={styles.renglonKg}>{fmt(Number(x.kg), 2)} kg</Text>
+                  </View>
                 ))}
                 <Text style={styles.subtitulo}>Balance</Text>
-                {filasBalance(h).map(f => <FilaBalance key={f.clave} {...f} />)}
-                <Text style={[styles.detalle, { marginTop: 6 }]}>
-                  Consumo de MS {h.ctmsPctPV.toFixed(2)} % PV · Ca/P {h.relacionCaP ? h.relacionCaP.toFixed(2) : '–'}
+                {filasBalance(h).map(f => <BarraBalance key={f.clave} {...f} nombre={f.titulo} />)}
+                <Text style={[styles.detalle, { marginTop: 8 }]}>
+                  Consumo de MS: {fmt(h.ctmsPctPV, 2)} % del peso vivo. Relación Ca/P: {h.relacionCaP ? fmt(h.relacionCaP, 2) : '–'}.
                 </Text>
                 {h.alertas.length > 0 ? (
                   <View style={{ marginTop: 8 }}>
@@ -178,38 +198,95 @@ export default function Historial({ historial, cargarDelHistorial, borrarDelHist
 }
 
 const styles = StyleSheet.create({
+  vacio: {
+    fontFamily: fuentes.regular,
+    fontSize: 16,
+    color: tema.suave,
+  },
   tarjeta: {
     borderWidth: 1,
-    borderColor: colores.linea,
+    borderColor: tema.linea,
     borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
+    padding: 14,
+    marginBottom: 12,
+  },
+  cabeza: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    gap: 8,
   },
   nombre: {
-    fontWeight: 'bold',
-    fontSize: 15,
+    fontFamily: fuentes.semi,
+    fontSize: 19,
+    color: tema.tinta,
+    flexShrink: 1,
   },
   modulo: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: colores.verde,
-    textTransform: 'uppercase',
+    fontFamily: fuentes.medio,
+    fontSize: 14,
+    color: tema.marca,
   },
   detalle: {
-    color: colores.gris,
-    fontSize: 13,
+    fontFamily: fuentes.regular,
+    fontSize: 14,
+    color: tema.suave,
   },
   resumen: {
-    fontWeight: '600',
-    marginTop: 4,
+    flexDirection: 'row',
+    gap: 16,
+    marginTop: 10,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: tema.linea,
+  },
+  dato: {
+    flex: 1,
+  },
+  datoEtiqueta: {
+    fontFamily: fuentes.medio,
+    fontSize: 13,
+    color: tema.suave,
+  },
+  datoValor: {
+    fontFamily: fuentes.semi,
+    fontSize: 18,
+    color: tema.tinta,
+    fontVariant: ['tabular-nums'],
+  },
+  datoUnidad: {
+    fontFamily: fuentes.regular,
+    fontSize: 13,
+    color: tema.tenue,
   },
   subtitulo: {
-    fontWeight: 'bold',
-    marginTop: 8,
+    fontFamily: fuentes.semi,
+    fontSize: 16,
+    color: tema.tinta,
+    marginTop: 14,
     marginBottom: 4,
   },
+  renglon: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    paddingVertical: 4,
+  },
+  renglonNombre: {
+    fontFamily: fuentes.regular,
+    fontSize: 15,
+    color: tema.tinta,
+    flexShrink: 1,
+  },
+  renglonKg: {
+    fontFamily: fuentes.medio,
+    fontSize: 15,
+    color: tema.tinta,
+    fontVariant: ['tabular-nums'],
+  },
   accion: {
-    color: colores.verde,
-    fontWeight: '600',
+    fontFamily: fuentes.semi,
+    fontSize: 15,
+    color: tema.marca,
   },
 })

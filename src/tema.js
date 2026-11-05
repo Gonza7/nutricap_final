@@ -10,7 +10,7 @@ export const tema = {
   linea: '#e1e4df',      // bordes y separadores
   superficie: '#f4f5f2', // fondo de las barras y zonas apagadas
   fondo: '#ffffff',
-  marca: '#2f4a35',      // verde oscuro de la app (botones, pestaña activa)
+  marca: '#2b6545',      // verde del logo, un poco más oscuro (botones, pestaña activa)
   falta: '#a8432f',      // rojo apagado: falta o se pasa
   sobra: '#3d6b4a',      // verde: sobra o está dentro de lo esperado
 }

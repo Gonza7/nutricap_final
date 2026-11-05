@@ -3,6 +3,7 @@
 import { estadoBalance, fmt, mayuscula, nombreAlimento } from '../utiles'
 import { ETAPAS, MODULOS, SEXOS, filasBalance, moduloDe } from '../modulos'
 import { tema } from '../tema'
+import { LOGO_EMBLEMA, LOGO_NOMBRE } from './logoPdf'
 
 // Evita que un nombre con "<" o "&" rompa el HTML
 const esc = t => String(t ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -21,7 +22,8 @@ const ESTILO = `
     font-family: 'Barlow Semi Condensed', 'Arial Narrow', Helvetica, Arial, sans-serif;
     color: ${tema.tinta}; font-size: 11pt; line-height: 1.35; margin: 0;
   }
-  .marca { font-weight: 700; font-size: 11pt; color: ${tema.marca}; margin: 0; }
+  .logo { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; }
+  .logo img { display: block; }
   h1 { font-weight: 600; font-size: 22pt; line-height: 1.1; margin: 2px 0 0; }
   h2 { font-weight: 600; font-size: 13pt; margin: 20px 0 6px; padding-bottom: 4px; border-bottom: 1px solid ${tema.linea}; }
   .sub { color: ${tema.suave}; margin: 2px 0 0; }
@@ -71,6 +73,9 @@ const pagina = (titulo, cuerpo) => `<!DOCTYPE html><html><head><meta charset="ut
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(titulo)}</title>
 ${FUENTE}<style>${ESTILO}</style></head><body>${cuerpo}
 <p class="pie">Generado con NutriCap el ${fechaLegible(new Date().toISOString())}</p></body></html>`
+
+// Logo de arriba: el círculo con la cabra y el nombre al lado
+const LOGO = `<div class="logo">${LOGO_EMBLEMA.replace('<svg ', '<svg style="height:28px;width:auto" ')}${LOGO_NOMBRE.replace('<svg ', '<svg role="img" aria-label="NutriCap" style="height:19px;width:auto" ')}</div>`
 
 // Una celda de la grilla: etiqueta arriba, valor abajo
 const celda = (etiqueta, valor, unidad = '', grande = false) => `
@@ -143,7 +148,7 @@ function cuerpoCalculo(h) {
     : 'Fórmulas de la hoja tambo (FEDNA 2009, Elizondo 2002, NRC 1981).'
 
   return `<section class="hoja">
-    <p class="marca">NutriCap</p>
+    ${LOGO}
     <h1>${MODULOS[moduloDe(h)].tituloPdf}</h1>
     ${h.nombre ? `<p class="sub"><b>${esc(h.nombre)}</b></p>` : ''}
     <p class="sub">${fechaLegible(h.fecha)}</p>
@@ -198,7 +203,7 @@ export function htmlAlimentos(lista, descripcion) {
       <td class="n">${fmt(a.ca, 1)}</td><td class="n">${fmt(a.p, 1)}</td><td class="n">${fmt(a.fdn, 1)}</td>
       <td class="n">${a.precio ? '$ ' + fmt(a.precio, 0) : '<span class="tenue">–</span>'}</td></tr>`).join('')
   const cuerpo = `
-    <p class="marca">NutriCap</p>
+    ${LOGO}
     <h1>Tabla de alimentos</h1>
     <p class="sub">${esc(descripcion)}</p>
     <table style="margin-top:12px">

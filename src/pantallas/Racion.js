@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import Campo from '../componentes/Campo'
 import Grilla from '../componentes/Grilla'
-import { Boton, Cifras, Titulo } from '../componentes/PartesResultado'
+import { Aportes, Boton, Titulo } from '../componentes/PartesResultado'
 import { estilos } from '../estilos'
 import { fuentes, tema } from '../tema'
 import { fmt, nombreAlimento, sinAcentos } from '../utiles'
@@ -59,17 +59,7 @@ export default function Racion({ racion, todos, cambiarKg, agregarARacion, sacar
       {totales.msKg > 0 ? (
         <View>
           <Titulo>Aportes de la ración</Titulo>
-          <Cifras
-            items={[
-              { etiqueta: 'Materia seca', valor: fmt(totales.msKg, 3), unidad: 'kg por día' },
-              { etiqueta: 'Proteína bruta', valor: fmt(totales.pbG, 0), unidad: 'g por día' },
-              { etiqueta: 'Energía metabolizable', valor: fmt(totales.emMcal, 2), unidad: 'Mcal por día' },
-              { etiqueta: 'Calcio', valor: fmt(totales.caG, 1), unidad: 'g por día' },
-              { etiqueta: 'Fósforo', valor: fmt(totales.pG, 1), unidad: 'g por día' },
-              { etiqueta: 'FDN', valor: fmt(totales.fdnPct, 1), unidad: '% de la MS' },
-              { etiqueta: 'Costo', valor: '$ ' + fmt(totales.costo, 0), unidad: 'por día' },
-            ]}
-          />
+          <Aportes totales={totales} />
         </View>
       ) : null}
 

@@ -9,7 +9,7 @@ import {
 } from '@expo-google-fonts/barlow-semi-condensed'
 import { useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { calcularTambo } from './src/calculos/tambo'
 import { calcularCarne } from './src/calculos/carne'
 import { fmt, num } from './src/utiles'
@@ -326,11 +326,11 @@ export default function App () {
     <View style={styles.container}>
       {/* Encabezado y resumen, con el mismo ancho máximo que el contenido */}
       <View style={styles.columna}>
-        {/* Encabezado fijo: nombre a la izquierda, Tambo / Carne a la derecha */}
+        {/* Encabezado fijo: logo a la izquierda, Tambo / Carne a la derecha */}
         <View style={styles.encabezado}>
-          <View style={{ flexShrink: 1 }}>
-            <Text style={styles.titulo}>NutriCap</Text>
-            <Text style={styles.subtitulo}>{MODULOS[modulo].subtitulo}</Text>
+          <View style={styles.logo} accessible accessibilityRole="header" accessibilityLabel="NutriCap">
+            <Image source={require('./assets/logo-emblema.png')} style={styles.logoEmblema} resizeMode="contain" />
+            <Image source={require('./assets/logo-nombre.png')} style={styles.logoNombre} resizeMode="contain" />
           </View>
           {/* El selector de módulo solo aparece donde cambia algo: Animal, Ración y Resultados */}
           {['cabra', 'racion', 'resultados'].includes(pestana) ? (
@@ -481,16 +481,20 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     paddingBottom: 12,
   },
-  titulo: {
-    fontFamily: fuentes.negrita,
-    fontSize: 28,
-    color: tema.tinta,
-    lineHeight: 32,
+  // Logo: el círculo con la cabra y el nombre al lado.
+  // Los tamaños respetan la proporción de cada imagen (171 x 178 y 326 x 84).
+  logo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  subtitulo: {
-    fontFamily: fuentes.regular,
-    fontSize: 15,
-    color: tema.suave,
+  logoEmblema: {
+    width: 44,
+    height: 46,
+  },
+  logoNombre: {
+    width: 120,
+    height: 31,
   },
   // Resumen: cuatro números en fila, entre dos líneas finas
   resumen: {

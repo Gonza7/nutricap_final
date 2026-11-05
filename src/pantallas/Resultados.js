@@ -2,7 +2,7 @@
 import { Text, View } from 'react-native'
 import BarraBalance from '../componentes/BarraBalance'
 import GuardarCalculo from '../componentes/GuardarCalculo'
-import { Alertas, Cifras, SinPeso, Titulo } from '../componentes/PartesResultado'
+import { Alertas, Aportes, Cifras, SinPeso, Titulo } from '../componentes/PartesResultado'
 import { fuentes, tema } from '../tema'
 import { fmt } from '../utiles'
 
@@ -47,6 +47,10 @@ export default function Resultados({ r, pesoCargado, irAAnimal, guardarEnHistori
               },
             ]}
           />
+
+          {/* 4. Aportes: lo que da la ración, para comparar con los requerimientos de abajo */}
+          <Titulo>Aportes de la ración</Titulo>
+          <Aportes totales={totales} />
         </View>
       ) : (
         <View>
@@ -57,7 +61,7 @@ export default function Resultados({ r, pesoCargado, irAAnimal, guardarEnHistori
         </View>
       )}
 
-      {/* 4. Requerimientos */}
+      {/* 5. Requerimientos */}
       <Titulo>Requerimientos en lactancia</Titulo>
       <Cifras
         items={[
@@ -79,7 +83,7 @@ export default function Resultados({ r, pesoCargado, irAAnimal, guardarEnHistori
         </View>
       ) : null}
 
-      {/* 5. Guardar, siempre al final */}
+      {/* 6. Guardar, siempre al final */}
       {hayRacion ? (
         <GuardarCalculo
           guardarEnHistorial={guardarEnHistorial}

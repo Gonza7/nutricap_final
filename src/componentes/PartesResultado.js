@@ -1,6 +1,7 @@
 // Piezas que usan las dos pantallas de Resultados (tambo y carne), con el diseño nuevo.
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { fuentes, tema } from '../tema'
+import { fmt } from '../utiles'
 
 // Título de una sección, con una explicación corta opcional debajo
 export function Titulo({ children, nota }) {
@@ -25,6 +26,23 @@ export function Cifras({ items }) {
         </View>
       ))}
     </View>
+  )
+}
+
+// Aportes de la ración (los totales que calcula aportesRacion). Lo usan Ración y Resultados.
+export function Aportes({ totales }) {
+  return (
+    <Cifras
+      items={[
+        { etiqueta: 'Materia seca', valor: fmt(totales.msKg, 3), unidad: 'kg por día' },
+        { etiqueta: 'Proteína bruta', valor: fmt(totales.pbG, 0), unidad: 'g por día' },
+        { etiqueta: 'Energía metabolizable', valor: fmt(totales.emMcal, 2), unidad: 'Mcal por día' },
+        { etiqueta: 'Calcio', valor: fmt(totales.caG, 1), unidad: 'g por día' },
+        { etiqueta: 'Fósforo', valor: fmt(totales.pG, 1), unidad: 'g por día' },
+        { etiqueta: 'FDN', valor: fmt(totales.fdnPct, 1), unidad: '% de la MS' },
+        { etiqueta: 'Costo', valor: '$ ' + fmt(totales.costo, 0), unidad: 'por día' },
+      ]}
+    />
   )
 }
 
